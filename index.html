@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Fitness Dashboard</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <style>
+    :root{--bg:#f8fafc;--card:#fff;--ink:#0f172a;--muted:#64748b;--accent:#f97316;--accent-2:#ea580c;--line:#e2e8f0;--dark:#020617;--ok:#16a34a}
+    *{box-sizing:border-box} html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    body{min-height:100vh}
+    .app{max-width:460px;margin:0 auto;padding:16px 14px 32px}
+    .hero{background:linear-gradient(180deg,#0f172a,#111827);color:#fff;border-radius:28px;padding:18px;box-shadow:0 12px 30px rgba(15,23,42,.18)}
+    .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.row-center{display:flex;align-items:center;gap:10px}
+    .muted{color:#cbd5e1}.muted-dark{color:var(--muted)}
+    .hero h1{margin:6px 0 0;font-size:1.65rem}.hero p{margin:8px 0 0;font-size:.95rem}
+    .pill-btn,.icon-box{border:none;border-radius:18px;background:rgba(255,255,255,.10);color:#fff;padding:12px;cursor:pointer}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.stat{background:rgba(255,255,255,.10);border-radius:18px;padding:12px}.stat .label{font-size:.75rem;color:#cbd5e1}.stat .value{margin-top:4px;font-weight:700;font-size:1.08rem}
+    .card{background:var(--card);border-radius:28px;padding:16px;box-shadow:0 3px 18px rgba(15,23,42,.06);margin-top:14px}
+    .card h2{margin:0;font-size:1.15rem}.small{font-size:.86rem}.tiny{font-size:.75rem}
+    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#fff;border-radius:18px;padding:4px;box-shadow:0 3px 18px rgba(15,23,42,.06);margin-top:14px}
+    .tab{border:none;background:transparent;padding:10px 6px;border-radius:14px;font-weight:600;color:#475569;cursor:pointer}.tab.active{background:#0f172a;color:#fff}
+    .hidden{display:none !important}
+    .badge{padding:6px 10px;border-radius:999px;font-size:.75rem;font-weight:700;border:1px solid transparent}
+    .badge-corsa{background:#ffedd5;color:#c2410c;border-color:#fed7aa}.badge-tonificazione{background:#dbeafe;color:#1d4ed8;border-color:#bfdbfe}.badge-recupero{background:#dcfce7;color:#15803d;border-color:#bbf7d0}.badge-light{background:#f3e8ff;color:#7c3aed;border-color:#e9d5ff}.badge-riposo{background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+    .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.day-btn{border:1px solid var(--line);background:#fff;padding:12px 4px;border-radius:16px;font-weight:700;color:#475569;cursor:pointer}.day-btn.active{background:#0f172a;border-color:#0f172a;color:#fff}
+    .session-overview{background:#f8fafc;border-radius:18px;padding:14px}.session-overview .title{font-size:1.08rem;font-weight:700}
+    .mode-grid,.action-grid,.stat-grid{display:grid;gap:10px}.mode-grid,.action-grid,.stat-grid.two{grid-template-columns:repeat(2,1fr)}
+    .btn{border:none;border-radius:18px;padding:13px 14px;font-weight:700;cursor:pointer;background:#0f172a;color:#fff}.btn-outline{background:#fff;color:#0f172a;border:1px solid var(--line)}
+    .btn-light{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.15)}
+    .btn.active{background:#0f172a;color:#fff}.btn-outline.active{background:#0f172a;color:#fff;border-color:#0f172a}
+    .task{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid #f1f5f9;border-radius:18px;background:#fff}.task input{margin-top:3px;transform:scale(1.1)}
+    .progress-wrap{margin-top:8px}.progress-meta{display:flex;justify-content:space-between;font-size:.86rem;color:#64748b;margin-bottom:8px}.progress{height:11px;background:#e2e8f0;border-radius:999px;overflow:hidden}.progress>span{display:block;height:100%;background:#0f172a;border-radius:999px}
+    .stat-grid{grid-template-columns:repeat(2,1fr)} .mini-card{background:#fff;border-radius:24px;padding:14px;box-shadow:0 3px 18px rgba(15,23,42,.06)} .mini-card .value{font-size:1.6rem;font-weight:800}
+    .week-item{border:1px solid #f1f5f9;border-radius:18px;background:#fff;padding:14px}.week-head{display:flex;justify-content:space-between;gap:8px}.week-left{display:flex;gap:10px}.icon-pill{width:34px;height:34px;border-radius:14px;background:#f1f5f9;display:grid;place-items:center;font-size:1rem}
+    .full-screen{background:var(--dark);color:#fff;min-height:72vh;border-radius:28px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}.full-screen .phase{font-size:2.1rem;font-weight:800;margin-top:10px}.timer{font-size:4.5rem;font-weight:800;text-align:center;letter-spacing:-.04em;margin:24px 0}.big-val{font-size:3rem;font-weight:800}.exercise{font-size:1.8rem;font-weight:800;line-height:1.15;margin-top:8px}
+    .settings-row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    input[type="text"],textarea{width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);font:inherit;background:#fff}textarea{min-height:110px;resize:vertical}
+    .field{display:grid;gap:8px}.energy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .note-box{background:#f8fafc;border-radius:18px;padding:12px;font-size:.92rem;color:#334155}.chart{display:grid;gap:10px;margin-top:4px}.chart-row{display:grid;grid-template-columns:38px 1fr 50px;gap:10px;align-items:center}.bar{height:10px;border-radius:999px;background:#e2e8f0;overflow:hidden}.bar>span{display:block;height:100%;background:#0f172a}
+    .install-tip{margin-top:12px;padding:12px;border-radius:18px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;font-size:.88rem}
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+<script>
+const STORAGE_KEY = 'fitness-pwa-state-v1';
+const PLAN_CONFIG = {
+  meta: {
+    title: 'Rientro progressivo',
+    subtitle: 'Obiettivo: tonificazione generale + perdita peso graduale',
+    targetWeight: '60–62 kg',
+    profileLabel: '51 anni',
+    profileSubtitle: 'Ripartenza progressiva'
+  },
+  sessionTypes: {
+    Corsa: {
+      badgeClass: 'badge-corsa',
+      icon: '👟',
+      manualSteps: [
+        { label: 'Riscaldamento', detail: '5 min camminata veloce' },
+        { label: 'Blocco centrale', detail: '1 min corsa + 2 min camminata × 6' },
+        { label: 'Defaticamento', detail: '5 min camminata lenta' },
+        { label: 'Stretching', detail: '5 min mobilità e allungamento' },
+      ],
+      timedSequence: [
+        { phase: 'CAMMINATA', detail: 'Riscaldamento', seconds: 5 * 60, taskIndex: 0 },
+        ...Array.from({ length: 6 }).flatMap((_, idx) => [
+          { phase: 'CORSA', detail: `Ripetizione ${idx+1} / 6`, seconds: 60, taskIndex: 1, rep: idx+1, repTotal: 6 },
+          { phase: 'CAMMINATA', detail: `Recupero ${idx+1} / 6`, seconds: 120, taskIndex: 1, rep: idx+1, repTotal: 6 },
+        ]),
+        { phase: 'CAMMINATA', detail: 'Defaticamento', seconds: 5 * 60, taskIndex: 2 },
+        { phase: 'STRETCHING', detail: 'Mobilità finale', seconds: 5 * 60, taskIndex: 3 },
+      ],
+      supportsTimedMode: true,
+    },
+    Tonificazione: {
+      badgeClass: 'badge-tonificazione', icon: '🏋️', supportsTimedMode: false,
+    },
+    Recupero: {
+      badgeClass: 'badge-recupero', icon: '🌿', supportsTimedMode: true,
+      manualSteps: [
+        { label: 'Camminata', detail: '20–30 min a passo sciolto' },
+        { label: 'Mobilità', detail: '5–10 min stretching' },
+      ],
+      timedSequence: [
+        { phase: 'CAMMINATA', detail: 'Passeggiata rigenerante', seconds: 20 * 60, taskIndex: 0 },
+        { phase: 'MOBILITÀ', detail: 'Stretching finale', seconds: 5 * 60, taskIndex: 1 },
+      ]
+    },
+    Light: {
+      badgeClass: 'badge-light', icon: '💜', supportsTimedMode: true,
+      manualSteps: [{ label: 'Attività leggera', detail: 'Camminata lunga o corsa molto leggera' }],
+      timedSequence: [{ phase: 'LIGHT', detail: 'Camminata lunga o corsa leggera', seconds: 40 * 60, taskIndex: 0 }]
+    },
+    Riposo: { badgeClass: 'badge-riposo', icon: '🌙', supportsTimedMode: false }
+  },
+  days: [
+    { day:'Lun', fullDay:'Lunedì', type:'Corsa', goal:'Run/Walk 1+2 × 6', duration:25, tasks:['5 min camminata veloce','1 min corsa + 2 min camminata × 6','5 min defaticamento','Stretching 5 min'] },
+    { day:'Mar', fullDay:'Martedì', type:'Tonificazione', goal:'Circuito full body × 3 giri', duration:30, roundsTarget:3, tasks:['Squat × 12','Push-up × 8','Affondi × 8/gamba','Plank 20 sec','Glute bridge × 12'], exerciseTimers:{3:20} },
+    { day:'Mer', fullDay:'Mercoledì', type:'Recupero', goal:'Camminata + mobilità', duration:25, tasks:['Camminata 20–30 min','Stretching 5–10 min'] },
+    { day:'Gio', fullDay:'Giovedì', type:'Corsa', goal:'Run/Walk 1+2 × 6', duration:25, tasks:['5 min camminata veloce','1 min corsa + 2 min camminata × 6','5 min defaticamento'] },
+    { day:'Ven', fullDay:'Venerdì', type:'Tonificazione', goal:'Circuito full body × 3 giri', duration:30, roundsTarget:3, tasks:['Squat × 12','Push-up × 8','Affondi × 8/gamba','Plank 20 sec','Glute bridge × 12'], exerciseTimers:{3:20} },
+    { day:'Sab', fullDay:'Sabato', type:'Light', goal:'Camminata lunga o corsa leggera', duration:45, tasks:['Camminata 40–60 min oppure corsa molto leggera'] },
+    { day:'Dom', fullDay:'Domenica', type:'Riposo', goal:'Riposo totale', duration:0, tasks:['Solo movimento leggero quotidiano'] },
+  ],
+  historyData: [
+    { week:'W1', weight:69.8, score:62 },
+    { week:'W2', weight:69.2, score:75 },
+    { week:'W3', weight:68.8, score:81 },
+    { week:'W4', weight:68.3, score:84 },
+  ]
+};
+
+const supportsTimedMode = (type) => !!PLAN_CONFIG.sessionTypes[type]?.supportsTimedMode;
+const getManualSteps = (type) => PLAN_CONFIG.sessionTypes[type]?.manualSteps || [];
+const getTimedSequence = (type) => PLAN_CONFIG.sessionTypes[type]?.timedSequence || [];
+const badgeClass = (type) => PLAN_CONFIG.sessionTypes[type]?.badgeClass || 'badge-riposo';
+const iconFor = (type) => PLAN_CONFIG.sessionTypes[type]?.icon || '🔥';
+const fmt = (s) => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const defaultCompletion = () => Object.fromEntries(PLAN_CONFIG.days.map((d,i)=>[i,d.tasks.map(()=>false)]));
+const defaultRounds = () => Object.fromEntries(PLAN_CONFIG.days.map((d,i)=>d.roundsTarget?[i,0]:null).filter(Boolean));
+const defaultState = () => ({
+  tab:'oggi', selectedDay:0, completion:defaultCompletion(), rounds:defaultRounds(), weight:'68.3', energy:'media', notes:'Ginocchia ok. Ritmo corsa da tenere molto tranquillo.',
+  guided:false, runningMode:'timed', sessionStep:0, circuitIndex:0, timerRunning:false, timerIndex:0, timeLeft:getTimedSequence(PLAN_CONFIG.days[0].type)[0]?.seconds||0,
+  sound:true, exerciseTimerRunning:false, exerciseTimeLeft:0, deferredInstall:null, installPromptVisible:false
+});
+let state = loadState();
+let timerHandle=null, exerciseHandle=null;
+
+function loadState(){
+  try{ const raw=localStorage.getItem(STORAGE_KEY); return raw ? {...defaultState(), ...JSON.parse(raw)} : defaultState(); }
+  catch{ return defaultState(); }
+}
+function persist(){
+  const copy = {...state}; delete copy.deferredInstall; localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
+}
+function beep(freq=880,dur=0.12){
+  if(!state.sound) return;
+  try{
+    const ctx = beep.ctx || (beep.ctx = new (window.AudioContext||window.webkitAudioContext)());
+    const o = ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=0.03; o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+dur);
+  }catch{}
+}
+function currentDay(){ return PLAN_CONFIG.days[state.selectedDay]; }
+function activeTimedSequence(){ return getTimedSequence(currentDay().type); }
+function taskArray(){ return state.completion[state.selectedDay] || []; }
+function progressForDay(dayIndex){
+  const day=PLAN_CONFIG.days[dayIndex], done=state.completion[dayIndex]||[];
+  const taskRatio = done.length ? done.filter(Boolean).length/done.length : 0;
+  const roundRatio = day.roundsTarget ? Math.min((state.rounds[dayIndex]||0)/day.roundsTarget,1) : 1;
+  return Math.round((day.type==='Tonificazione' ? (taskRatio+roundRatio)/2 : taskRatio)*100);
+}
+function weeklyStats(){
+  let completedSessions=0,total=0,minutes=0;
+  PLAN_CONFIG.days.forEach((day,index)=>{
+    const done=state.completion[index]||[];
+    const tasksCompleted=done.length>0 && done.every(Boolean);
+    const roundsCompleted=day.roundsTarget ? (state.rounds[index]||0)>=day.roundsTarget : true;
+    const isCompleted=tasksCompleted && roundsCompleted;
+    if(day.type!=='Riposo') total+=1;
+    if(day.type!=='Riposo' && isCompleted) completedSessions+=1;
+    const taskRatio=done.length?done.filter(Boolean).length/done.length:0;
+    const roundRatio=day.roundsTarget?Math.min((state.rounds[index]||0)/day.roundsTarget,1):1;
+    const ratio=day.type==='Tonificazione'?(taskRatio+roundRatio)/2:taskRatio;
+    minutes += Math.round(day.duration*ratio);
+  });
+  const adherence=total?Math.round(completedSessions/total*100):0;
+  const streak=adherence>=80?3:adherence>=60?2:1;
+  const energyScore=state.energy==='alta'?90:state.energy==='media'?75:55;
+  const fitnessScore=Math.round((adherence + Math.min(minutes,180)/1.8 + energyScore)/3);
+  return {adherence, minutes, streak, fitnessScore};
+}
+function markTask(dayIndex, taskIndex, value){
+  const copy=(state.completion[dayIndex]||[]).slice(); copy[taskIndex]=value; state.completion[dayIndex]=copy; persist(); render();
+}
+function resetDay(dayIndex){
+  const day=PLAN_CONFIG.days[dayIndex]; state.completion[dayIndex]=day.tasks.map(()=>false); if(day.roundsTarget) state.rounds[dayIndex]=0;
+  state.guided=false; state.sessionStep=0; state.circuitIndex=0; state.timerRunning=false; state.timerIndex=0; state.timeLeft=getTimedSequence(day.type)[0]?.seconds||0; state.exerciseTimerRunning=false; state.exerciseTimeLeft=0;
+  persist(); stopIntervals(); render();
+}
+function stopIntervals(){ if(timerHandle) clearInterval(timerHandle); if(exerciseHandle) clearInterval(exerciseHandle); timerHandle=null; exerciseHandle=null; }
+function ensureTimedInterval(){
+  stopIntervals();
+  if(!state.guided || !state.timerRunning || !supportsTimedMode(currentDay().type)) return;
+  timerHandle=setInterval(()=>{
+    if(state.timeLeft>1){ state.timeLeft-=1; persist(); render(); return; }
+    beep(1040,0.16);
+    const seq=activeTimedSequence(), step=seq[state.timerIndex], day=currentDay();
+    if(typeof step?.taskIndex==='number' && step.taskIndex < day.tasks.length){ state.completion[state.selectedDay][step.taskIndex]=true; }
+    if(state.timerIndex < seq.length-1){ state.timerIndex +=1; state.timeLeft=seq[state.timerIndex].seconds; }
+    else{ state.timerRunning=false; state.guided=false; state.timerIndex=0; state.timeLeft=seq[0]?.seconds||0; }
+    persist(); render();
+  },1000);
+}
+function ensureExerciseInterval(){
+  if(exerciseHandle) clearInterval(exerciseHandle); exerciseHandle=null;
+  if(!state.guided || currentDay().type!=='Tonificazione' || !state.exerciseTimerRunning || state.exerciseTimeLeft<=0) return;
+  exerciseHandle=setInterval(()=>{
+    if(state.exerciseTimeLeft>1){ state.exerciseTimeLeft -=1; persist(); render(); return; }
+    beep(760,0.12); state.exerciseTimerRunning=false; state.exerciseTimeLeft=0; persist(); render();
+  },1000);
+}
+function selectDay(index){
+  state.selectedDay=index; state.guided=false; state.sessionStep=0; state.circuitIndex=0; state.timerRunning=false; state.timerIndex=0; state.timeLeft=getTimedSequence(currentDay().type)[0]?.seconds||0; state.exerciseTimerRunning=false; state.exerciseTimeLeft=0;
+  persist(); stopIntervals(); render();
+}
+function startSession(){
+  const day=currentDay(); if(day.type==='Riposo') return;
+  state.guided=true; state.sessionStep=0; state.circuitIndex=0; state.timerIndex=0; state.timeLeft=getTimedSequence(day.type)[0]?.seconds||0; state.timerRunning=supportsTimedMode(day.type) && state.runningMode==='timed';
+  state.exerciseTimerRunning=false; state.exerciseTimeLeft=(day.exerciseTimers?.[0]||0); beep(640,0.08); persist(); render(); if(state.timerRunning) ensureTimedInterval();
+}
+function exitSession(){
+  state.guided=false; state.sessionStep=0; state.circuitIndex=0; state.timerRunning=false; state.timerIndex=0; state.timeLeft=getTimedSequence(currentDay().type)[0]?.seconds||0; state.exerciseTimerRunning=false; state.exerciseTimeLeft=0;
+  persist(); stopIntervals(); render();
+}
+function completeManualStep(){
+  const steps=getManualSteps(currentDay().type); if(!steps.length) return;
+  const idx=Math.min(state.sessionStep, taskArray().length-1); if(idx>=0) state.completion[state.selectedDay][idx]=true; beep(880,0.1);
+  if(state.sessionStep < steps.length-1) state.sessionStep +=1; else { state.guided=false; state.sessionStep=0; }
+  persist(); render();
+}
+function completeCircuitExercise(){
+  const day=currentDay(); const idx=state.circuitIndex; state.completion[state.selectedDay][idx]=true; beep(900,0.1);
+  if(idx < day.tasks.length-1){ state.circuitIndex +=1; state.exerciseTimeLeft=day.exerciseTimers?.[state.circuitIndex]||0; state.exerciseTimerRunning=false; persist(); render(); return; }
+  const newRounds=Math.min((state.rounds[state.selectedDay]||0)+1, day.roundsTarget||0); state.rounds[state.selectedDay]=newRounds;
+  if(newRounds < (day.roundsTarget||0)){ state.completion[state.selectedDay]=day.tasks.map(()=>false); state.circuitIndex=0; state.exerciseTimeLeft=day.exerciseTimers?.[0]||0; state.exerciseTimerRunning=false; }
+  else{ state.guided=false; state.circuitIndex=0; state.exerciseTimeLeft=0; state.exerciseTimerRunning=false; }
+  persist(); render();
+}
+function skipTimedStep(){
+  const seq=activeTimedSequence(), step=seq[state.timerIndex], day=currentDay(); if(typeof step?.taskIndex==='number' && step.taskIndex < day.tasks.length) state.completion[state.selectedDay][step.taskIndex]=true;
+  beep(980,0.1);
+  if(state.timerIndex < seq.length-1){ state.timerIndex +=1; state.timeLeft=seq[state.timerIndex].seconds; }
+  else{ state.guided=false; state.timerRunning=false; state.timerIndex=0; state.timeLeft=seq[0]?.seconds||0; }
+  persist(); render();
+}
+function installApp(){ if(state.deferredInstall){ state.deferredInstall.prompt(); state.deferredInstall.userChoice.finally(()=>{ state.installPromptVisible=false; persist(); render(); }); } }
+
+function render(){
+  const day=currentDay(); const stats=weeklyStats(); const app=document.getElementById('app'); const progress=progressForDay(state.selectedDay);
+  const guidedSteps=getManualSteps(day.type); const seq=activeTimedSequence(); const timed=seq[state.timerIndex];
+  const showTimed = state.guided && state.runningMode==='timed' && supportsTimedMode(day.type);
+  const showManual = state.guided && !showTimed && day.type!=='Tonificazione';
+  const showCircuit = state.guided && day.type==='Tonificazione';
+  app.innerHTML = `
+    <section class="hero">
+      <div class="row">
+        <div>
+          <div class="small muted">Fitness dashboard</div>
+          <h1>${PLAN_CONFIG.meta.title}</h1>
+          <p class="muted">${PLAN_CONFIG.meta.subtitle}</p>
+        </div>
+        <div class="row-center">
+          <button class="pill-btn" id="soundToggle" aria-label="audio">${state.sound ? '🔊' : '🔇'}</button>
+          <div class="icon-box">🔥</div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">Peso</div><div class="value">${state.weight} kg</div></div>
+        <div class="stat"><div class="label">Score</div><div class="value">${stats.fitnessScore}</div></div>
+        <div class="stat"><div class="label">Streak</div><div class="value">${stats.streak} sett.</div></div>
+      </div>
+      ${state.installPromptVisible ? `<div class="install-tip">Questa versione è pronta per essere installata: usa il pulsante qui sotto oppure il menu del browser.</div><div style="margin-top:10px"><button class="btn" id="installBtn" style="width:100%">Installa la web app</button></div>`:''}
+    </section>
+
+    ${showCircuit ? `
+    <section class="card full-screen">
+      <div>
+        <div class="settings-row"><span class="badge">Circuito</span><button class="btn btn-light" id="exitSession">Esci</button></div>
+        <div style="margin-top:22px"><div class="small muted">Giro</div><div class="big-val">${Math.min((state.rounds[state.selectedDay]||0)+1, day.roundsTarget)} / ${day.roundsTarget}</div></div>
+        <div style="margin-top:22px"><div class="small muted">Esercizio corrente</div><div class="exercise">${day.tasks[state.circuitIndex]}</div></div>
+        ${day.exerciseTimers?.[state.circuitIndex] ? `
+          <div class="note-box" style="margin-top:18px;background:rgba(255,255,255,.05);color:#fff">
+            <div class="small muted">Timer esercizio</div>
+            <div class="big-val" style="font-size:2.25rem;margin-top:4px">${fmt(state.exerciseTimeLeft || day.exerciseTimers[state.circuitIndex])}</div>
+            <div style="margin-top:10px"><button class="btn btn-light" id="toggleExerciseTimer">${state.exerciseTimerRunning ? 'Pausa timer' : 'Avvia timer'}</button></div>
+          </div>`:''}
+      </div>
+      <div>
+        <div class="progress-meta"><span class="muted">Avanzamento giro</span><span class="muted">${state.circuitIndex+1}/${day.tasks.length}</span></div>
+        <div class="progress"><span style="width:${((state.circuitIndex+1)/day.tasks.length)*100}%"></span></div>
+        <div style="margin-top:14px"><button class="btn" id="circuitDone" style="width:100%;padding:16px 14px;font-size:1.05rem">Fatto</button></div>
+      </div>
+    </section>`:''}
+
+    ${showTimed ? `
+    <section class="card full-screen">
+      <div>
+        <div class="settings-row"><span class="badge">Timer automatico</span><button class="btn btn-light" id="exitSession">Esci</button></div>
+        <div style="margin-top:24px"><div class="small muted">Fase</div><div class="phase">${timed?.phase || ''}</div><div class="small" style="color:#cbd5e1;margin-top:8px">${timed?.detail || ''}</div></div>
+        <div class="timer">${fmt(state.timeLeft)}</div>
+      </div>
+      <div>
+        <div class="progress-meta"><span class="muted">Avanzamento sessione</span><span class="muted">${state.timerIndex+1}/${seq.length}</span></div>
+        <div class="progress"><span style="width:${((state.timerIndex+1)/seq.length)*100}%"></span></div>
+        <div class="action-grid" style="grid-template-columns:repeat(3,1fr);margin-top:14px">
+          <button class="btn btn-light" id="pauseTimer">⏯</button>
+          <button class="btn btn-light" id="skipTimer">⏭</button>
+          <button class="btn" id="stopSession">Stop</button>
+        </div>
+      </div>
+    </section>`:''}
+
+    ${showManual ? `
+    <section class="card full-screen">
+      <div>
+        <div class="settings-row"><span class="badge">Modalità manuale</span><button class="btn btn-light" id="exitSession">Esci</button></div>
+        <div style="margin-top:24px"><div class="small muted">Step corrente</div><div class="phase">${guidedSteps[state.sessionStep]?.label || ''}</div><div class="small" style="color:#cbd5e1;margin-top:8px">${guidedSteps[state.sessionStep]?.detail || ''}</div></div>
+      </div>
+      <div>
+        <div class="progress-meta"><span class="muted">Avanzamento sessione</span><span class="muted">${state.sessionStep+1}/${guidedSteps.length}</span></div>
+        <div class="progress"><span style="width:${((state.sessionStep+1)/guidedSteps.length)*100}%"></span></div>
+        <div style="margin-top:14px"><button class="btn" id="manualDone" style="width:100%;padding:16px 14px;font-size:1.05rem">Step completato</button></div>
+      </div>
+    </section>`:''}
+
+    <nav class="tabs">
+      ${['oggi','settimana','metriche','storico'].map(t=>`<button class="tab ${state.tab===t?'active':''}" data-tab="${t}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}
+    </nav>
+
+    <section class="${state.tab==='oggi'?'':'hidden'}">
+      <div class="card">
+        <div class="row"><div><h2>Allenamento del giorno</h2><div class="small muted-dark">Vista dettagliata prima della sessione, essenziale durante l’esecuzione</div></div><span class="badge ${badgeClass(day.type)}">${day.type}</span></div>
+        <div class="day-grid" style="margin-top:14px">${PLAN_CONFIG.days.map((d,i)=>`<button class="day-btn ${state.selectedDay===i?'active':''}" data-day="${i}">${d.day}</button>`).join('')}</div>
+        <div class="session-overview" style="margin-top:14px">
+          <div class="row"><div><div class="small muted-dark">${day.fullDay}</div><div class="title">${day.goal}</div></div><div style="font-size:1.3rem">${iconFor(day.type)}</div></div>
+          <div class="small muted-dark" style="margin-top:10px">⏱ ${day.duration} minuti stimati</div>
+        </div>
+        ${supportsTimedMode(day.type) ? `
+        <div class="task" style="margin-top:14px;display:block">
+          <div class="small muted-dark" style="margin-bottom:10px">Modalità sessione</div>
+          <div class="mode-grid two">
+            <button class="btn-outline btn ${state.runningMode==='manual'?'active':''}" id="modeManual">Manuale</button>
+            <button class="btn-outline btn ${state.runningMode==='timed'?'active':''}" id="modeTimed">Timer automatico</button>
+          </div>
+        </div>`:''}
+        ${day.type==='Tonificazione' ? `
+        <div class="task" style="margin-top:14px;display:block">
+          <div class="settings-row"><div><div class="small muted-dark">Giri completati</div><div style="font-weight:800;font-size:1.1rem">${state.rounds[state.selectedDay]||0} / ${day.roundsTarget}</div></div><div class="small muted-dark" style="text-align:right">Esercizio corrente<br><strong style="color:#0f172a">${day.tasks[state.circuitIndex]}</strong></div></div>
+        </div>`:''}
+        <div style="display:grid;gap:10px;margin-top:14px">${day.tasks.map((task,i)=>`<label class="task"><input type="checkbox" data-task="${i}" ${taskArray()[i]?'checked':''}><span>${task}</span></label>`).join('')}</div>
+        <div class="progress-wrap"><div class="progress-meta"><span>Completamento del giorno</span><span>${progress}%</span></div><div class="progress"><span style="width:${progress}%"></span></div></div>
+        <div class="action-grid two" style="margin-top:14px"><button class="btn" id="startSession">▶ ${day.type==='Tonificazione'?'Modalità circuito':(state.runningMode==='timed'&&supportsTimedMode(day.type)?'Sessione con timer':'Modalità guidata')}</button><button class="btn btn-outline" id="resetDay">↺ Reset</button></div>
+      </div>
+    </section>
+
+    <section class="${state.tab==='settimana'?'':'hidden'}">
+      <div class="stat-grid two" style="margin-top:14px">
+        <div class="mini-card"><div class="small muted-dark">Aderenza</div><div class="value">${stats.adherence}%</div><div class="tiny muted-dark">Target consigliato ≥ 80%</div></div>
+        <div class="mini-card"><div class="small muted-dark">Carico</div><div class="value">${stats.minutes} min</div><div class="tiny muted-dark">Range ideale 120–180 min</div></div>
+      </div>
+      <div class="card">
+        <h2>Piano settimanale</h2>
+        <div style="display:grid;gap:10px;margin-top:14px">${PLAN_CONFIG.days.map((d,i)=>{const prog=progressForDay(i);return `<div class="week-item"><div class="week-head"><div class="week-left"><div class="icon-pill">${iconFor(d.type)}</div><div><div style="font-weight:700">${d.fullDay}</div><div class="small muted-dark">${d.goal}</div>${d.roundsTarget?`<div class="tiny muted-dark">Giri: ${state.rounds[i]||0}/${d.roundsTarget}</div>`:''}</div></div><div style="text-align:right"><div style="font-weight:700">${prog}%</div><div class="tiny muted-dark">${(state.completion[i]||[]).filter(Boolean).length}/${d.tasks.length} step</div></div></div><div class="progress" style="margin-top:10px"><span style="width:${prog}%"></span></div></div>`}).join('')}</div>
+      </div>
+    </section>
+
+    <section class="${state.tab==='metriche'?'':'hidden'}">
+      <div class="stat-grid two" style="margin-top:14px">
+        <div class="mini-card"><div class="small muted-dark">Peso target</div><div class="value">${PLAN_CONFIG.meta.targetWeight}</div><div class="tiny muted-dark">Obiettivo 3–5 mesi</div></div>
+        <div class="mini-card"><div class="small muted-dark">Età / profilo</div><div class="value">${PLAN_CONFIG.meta.profileLabel}</div><div class="tiny muted-dark">${PLAN_CONFIG.meta.profileSubtitle}</div></div>
+      </div>
+      <div class="card">
+        <h2>Aggiorna le metriche</h2>
+        <div class="field" style="margin-top:14px"><label class="small muted-dark">Peso attuale</label><input type="text" id="weightInput" value="${state.weight}" /></div>
+        <div class="field" style="margin-top:14px"><label class="small muted-dark">Energia percepita</label><div class="energy-grid">${['bassa','media','alta'].map(v=>`<button class="btn-outline btn ${state.energy===v?'active':''}" data-energy="${v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join('')}</div></div>
+        <div class="field" style="margin-top:14px"><label class="small muted-dark">Note</label><textarea id="notesInput">${state.notes}</textarea></div>
+      </div>
+      <div class="card"><h2>Diagnostica</h2><div class="note-box" style="margin-top:12px">${stats.fitnessScore>=80?'Settimana in buona traiettoria. Puoi mantenere il carico attuale.':stats.fitnessScore>=60?'Settimana discreta. Conviene consolidare prima di aumentare il volume.':'Carico o costanza da rivedere. Meglio semplificare il piano e ripartire da una baseline sostenibile.'}</div><div class="note-box" style="margin-top:10px">Se energia bassa o compaiono fastidi articolari, non aumentare né corsa né volume esercizi nella settimana successiva.</div></div>
+    </section>
+
+    <section class="${state.tab==='storico'?'':'hidden'}">
+      <div class="stat-grid two" style="margin-top:14px">
+        <div class="mini-card"><div class="small muted-dark">Trend peso</div><div class="value">-1.5 kg</div><div class="tiny muted-dark">Ultime 4 settimane</div></div>
+        <div class="mini-card"><div class="small muted-dark">Miglior score</div><div class="value">84</div><div class="tiny muted-dark">Aderenza in crescita</div></div>
+      </div>
+      <div class="card"><h2>Andamento settimanale</h2><div class="chart">${PLAN_CONFIG.historyData.map(row=>`<div class="chart-row"><div class="small muted-dark">${row.week}</div><div class="bar"><span style="width:${row.score}%"></span></div><div class="small">${row.weight}kg</div></div>`).join('')}</div></div>
+      <div class="card"><h2>Configurazione del piano</h2><div class="note-box" style="margin-top:12px">Il piano è data-driven: giorni, tipi di sessione, step manuali, sequenze temporizzate e timer esercizi vivono nella configurazione centrale.</div><div class="note-box" style="margin-top:10px">Prossimo passo naturale: spostare questa configurazione in un JSON esterno con validazione.</div></div>
+    </section>
+  `;
+
+  bindEvents();
+}
+
+function bindEvents(){
+  document.querySelectorAll('[data-tab]').forEach(el=>el.onclick=()=>{state.tab=el.dataset.tab; persist(); render();});
+  document.querySelectorAll('[data-day]').forEach(el=>el.onclick=()=>selectDay(Number(el.dataset.day)));
+  document.querySelectorAll('[data-task]').forEach(el=>el.onchange=()=>markTask(state.selectedDay, Number(el.dataset.task), el.checked));
+  document.getElementById('soundToggle')?.addEventListener('click',()=>{state.sound=!state.sound; persist(); render();});
+  document.getElementById('installBtn')?.addEventListener('click', installApp);
+  document.getElementById('modeManual')?.addEventListener('click',()=>{state.runningMode='manual'; persist(); render();});
+  document.getElementById('modeTimed')?.addEventListener('click',()=>{state.runningMode='timed'; persist(); render();});
+  document.getElementById('startSession')?.addEventListener('click', startSession);
+  document.getElementById('resetDay')?.addEventListener('click',()=>resetDay(state.selectedDay));
+  document.getElementById('exitSession')?.addEventListener('click', exitSession);
+  document.getElementById('stopSession')?.addEventListener('click', exitSession);
+  document.getElementById('pauseTimer')?.addEventListener('click',()=>{state.timerRunning=!state.timerRunning; persist(); render(); ensureTimedInterval();});
+  document.getElementById('skipTimer')?.addEventListener('click', skipTimedStep);
+  document.getElementById('manualDone')?.addEventListener('click', completeManualStep);
+  document.getElementById('circuitDone')?.addEventListener('click', completeCircuitExercise);
+  document.getElementById('toggleExerciseTimer')?.addEventListener('click',()=>{state.exerciseTimerRunning=!state.exerciseTimerRunning; persist(); render(); ensureExerciseInterval();});
+  document.getElementById('weightInput')?.addEventListener('input',(e)=>{state.weight=e.target.value; persist();});
+  document.getElementById('notesInput')?.addEventListener('input',(e)=>{state.notes=e.target.value; persist();});
+  document.querySelectorAll('[data-energy]').forEach(el=>el.onclick=()=>{state.energy=el.dataset.energy; persist(); render();});
+}
+
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault(); state.deferredInstall=e; state.installPromptVisible=true; render();
+});
+window.addEventListener('appinstalled',()=>{ state.installPromptVisible=false; state.deferredInstall=null; persist(); render(); });
+
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js')); }
+render();
+</script>
+</body>
+</html>

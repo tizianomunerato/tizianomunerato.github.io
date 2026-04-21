@@ -1,0 +1,22 @@
+{
+  "name": "Fitness Dashboard",
+  "short_name": "Fitness",
+  "description": "Dashboard fitness personale con piano data-driven, timer e salvataggio locale.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
+  "lang": "it",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
